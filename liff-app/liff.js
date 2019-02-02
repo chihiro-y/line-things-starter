@@ -12,6 +12,10 @@ const PSDI_CHARACTERISTIC_UUID  = '26E2B12B-85F0-4F3F-9FDD-91D114270E6E';
 let ledState = false; // true: LED on, false: LED off
 let clickCount = 0;
 
+//Add
+const READ_SERVICE_UUID         = '9E52F36D-16B2-4DEF-9A8C-20988876CDEE';
+
+
 // -------------- //
 // On window load //
 // -------------- //
@@ -208,6 +212,17 @@ function liffConnectToDevice(device) {
 }
 
 function liffGetUserService(service) {
+    // Read value
+    service.getCharacteristic(READ_CHARACTERISTIC_UUID).then(characteristic => {
+        return characteristic.readValue();
+    }).then(value => {
+        // Convert byte buffer to Int32 in little endian
+        const value = new DataView(value.buffer).getInt32(0, true);
+        document.getElementById("total-count").innerText = value;
+    }).catch(error => {
+        uiStatusError(makeErrorMsg(error), false);
+    });
+    
     // Button pressed state
     service.getCharacteristic(BTN_CHARACTERISTIC_UUID).then(characteristic => {
         liffGetButtonStateCharacteristic(characteristic);
